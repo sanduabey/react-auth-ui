@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 class SignInForm extends Component {
-    constructor() {
-        super();
-
-        this.state = {
-            email: '',
-            password: ''
-        };
+  constructor() {
+    super();
+      
+    this.state = {
+      email: '',
+      password: '',
+      users: [
+        { email: 'a@a.com', password: 'passwordA' },
+        { email: 'b@b.com', password: 'passwordB' },
+        { email: 'c@c.com', password: 'passwordC' },
+      ],
+      isAuthenticated: false
+    };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -25,14 +31,37 @@ class SignInForm extends Component {
     }
 
     handleSubmit(e) {
-        e.preventDefault();
+      e.preventDefault();
 
-        console.log('The form was submitted with the following data:');
-        console.log(this.state);
+      let target = e.target;
+      console.log(target.id);
+
+      
+
+      let isValid = this.validateUser(this.state.email, this.state.password);
+      this.setState({
+        isAuthenticated: isValid
+      });
+      if (target.id =='back-button') {
+            this.setState({isAuthenticated: false});
+            this.render();
+          }
+          // console.log(this.state);
     }
 
-    render() {
-        return (
+  validateUser = (email, pwd) => {
+    let uValid = false;
+    this.state.users.forEach(user => {
+      if (user.email == email && user.password == pwd) {
+        uValid = true;
+      }
+    });
+    return uValid;
+  }
+
+  render() {
+    if (!this.state.isAuthenticated) {
+      return (
         <div className="FormCenter">
             <form onSubmit={this.handleSubmit} className="FormFields" onSubmit={this.handleSubmit}>
             <div className="FormField">
@@ -46,11 +75,25 @@ class SignInForm extends Component {
               </div>
 
               <div className="FormField">
-                  <button className="FormField__Button mr-20">Sign In</button> <Link to="/" className="FormField__Link">Create an account</Link>
+              
+                <button className="FormField__Button mr-20">
+                  
+                    Sign In
+                  
+                  </button> 
               </div>
             </form>
           </div>
         );
+    } else {
+      return (
+        <div className = "Home">
+          <h2> Welcome {this.state.email}</h2>
+          <button id='back-button' onClick= {this.handleSubmit}>Back</button>
+        </div>
+      )
+    }
+      
     }
 }
 
